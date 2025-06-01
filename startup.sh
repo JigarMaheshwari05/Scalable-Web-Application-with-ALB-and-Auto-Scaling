@@ -3,17 +3,15 @@
 # Update system packages
 sudo yum update -y
 
-# Install Node.js and npm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-. ~/.nvm/nvm.sh
-nvm install 18
-nvm use 18
-
-# Install PM2 globally
-sudo npm install -g pm2
+# Install Node.js directly from NodeSource repository
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
 
 # Install git
 sudo yum install -y git
+
+# Install PM2 globally
+npm install pm2 -g
 
 # Create application directory
 mkdir -p /home/ec2-user/app
@@ -25,9 +23,11 @@ git clone https://github.com/JigarMaheshwari05/Scalable-Web-Application-with-ALB
 # Install dependencies
 npm install
 
-# Start the application with PM2
-pm2 start app.js --name "instance-info" -- start
+# Setup PM2 to start on boot
+pm2 startup
 
-# Save PM2 process list and configure PM2 to start on system startup
+# Start the application with PM2
+pm2 start app.js --name "instance-info"
+
+# Save the PM2 process list
 pm2 save
-sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user

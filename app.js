@@ -1,14 +1,12 @@
 const express = require('express');
-const { EC2MetadataClient } = require('aws-ec2-metadata');
+const metadata = require('aws-ec2-instance-metadata');
 const app = express();
 const port = 3000;
 
-const client = new EC2MetadataClient();
-
 app.get('/', async (req, res) => {
     try {
-        const instanceId = await client.getInstanceId();
-        const privateIp = await client.getPrivateIpAddress();
+        const instanceId = await metadata.getInstanceId();
+        const privateIp = await metadata.getInstancePrivateIp();
         
         res.json({
             instanceId: instanceId,
