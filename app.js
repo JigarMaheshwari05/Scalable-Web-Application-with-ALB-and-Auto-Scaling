@@ -1,21 +1,60 @@
 const express = require('express');
-const metadata = require('ec2-metadata');
+const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
+
+async function getMetadataToken() {
+    try {
+        const response = await axios.put(
+            'http://169.254.169.254/latest/api/token',
+            '',
+            {
+                headers: {
+                    'X-aws-ec2-metadata-token-ttl-seconds': '21600'
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log('Not running on EC2 or unable to get token');
+        return null;
+    }
+}
+
+async function getMetadata(token, path) {
+    try {
+        const response = await axios.get(
+            `http://169.254.169.254/latest/meta-data/${path}`,
+            {
+                headers: {
+                    'X-aws-ec2-metadata-token': token
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(`Unable to get metadata for ${path}`);
+        return null;
+    }
+}
 
 app.get('/', async (req, res) => {
     try {
         let instanceId = 'local-development';
         let privateIp = '127.0.0.1';
 
-        // Only try to get EC2 metadata if we're running on EC2
-        try {
-            instanceId = await metadata.getInstanceId();
-            privateIp = await metadata.getInstancePrivateIpv4();
-        } catch (metadataError) {
-            console.log('Not running on EC2, using default values');
+        // Try to get EC2 metadata
+        const token = await getMetadataToken();
+        if (token) {
+            const fetchedInstanceId = await getMetadata(token, 'instance-id');
+            const fetchedPrivateIp = await getMetadata(token, 'local-ipv4');
+            
+            if (fetchedInstanceId && fetchedPrivateIp) {
+                instanceId = fetchedInstanceId;
+                privateIp = fetchedPrivateIp;
+            }
         }
-        
+
         res.json({
             instanceId: instanceId,
             privateIp: privateIp,

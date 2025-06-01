@@ -39,5 +39,3 @@ sudo pm2 save
 # Ensure PM2 is running
 sudo systemctl start pm2-root
 
-# Add firewall rule for port 3000 if needed
-sudo iptables -A INPUT -p tcp --dport 3000 -j ACCEPT
