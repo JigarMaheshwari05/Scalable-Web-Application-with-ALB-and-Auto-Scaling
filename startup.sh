@@ -10,8 +10,12 @@ sudo yum install -y nodejs
 # Install git
 sudo yum install -y git
 
-# Install PM2 globally
-npm install pm2 -g
+# Install PM2 globally with sudo
+sudo npm install pm2 -g
+
+# Set proper permissions for npm global directory
+sudo chown -R $USER:$(id -gn $USER) ~/.config
+sudo chown -R $USER:$(id -gn $USER) ~/.npm
 
 # Create application directory
 mkdir -p /home/ec2-user/app
@@ -23,11 +27,17 @@ git clone https://github.com/JigarMaheshwari05/Scalable-Web-Application-with-ALB
 # Install dependencies
 npm install
 
-# Setup PM2 to start on boot
-pm2 startup
+# Setup PM2 to start on boot with sudo
+sudo pm2 startup amazon
 
-# Start the application with PM2
-pm2 start app.js --name "instance-info"
+# Start the application with PM2 with specific port
+sudo pm2 start app.js --name "instance-info" -- 3000
 
 # Save the PM2 process list
-pm2 save
+sudo pm2 save
+
+# Ensure PM2 is running
+sudo systemctl start pm2-root
+
+# Add firewall rule for port 3000 if needed
+sudo iptables -A INPUT -p tcp --dport 3000 -j ACCEPT
