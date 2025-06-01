@@ -30,12 +30,13 @@ npm install
 # Setup PM2 to start on boot with sudo
 sudo pm2 startup amazon
 
-# Start the application with PM2 with specific port
-sudo pm2 start app.js --name "instance-info" -- 3000
+# Start the application with PM2 with port 80 (requires root)
+sudo pm2 start app.js --name "instance-info" --port 80 -- 80
 
 # Save the PM2 process list
 sudo pm2 save
 
 # Ensure PM2 is running
 sudo systemctl start pm2-root
+
 
