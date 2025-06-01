@@ -151,35 +151,35 @@ Here the My Website
 
 This sample site which Instance Info like Private IP , instance type, instance ID, and AZ.
 
-![image.png]("assests/Screenshot from 2025-06-01 22-24-49.png")
+![image.png](assests/website.png)
 
 Here My Instance running in Auto scaling group
 
-![image.png](attachment:b3cf4944-a396-4ab8-a0ce-486b664aa912:image.png)
+![image.png](assests/instance.png)
 
 Here my ALB details 
 
-![ALB.png](attachment:299cb0a5-fb88-4041-8364-ffdc03a042bf:ALB.png)
+![ALB.png](assests/ALB.png)
 
 I have setup listener port on 80 and my target group port is 80
 
 Autoscalling Group Details
 
-![AS.png](attachment:d497bec1-39f2-4d1d-a928-5ed5da9ee33f:AS.png)
+![AS.png](assests/AS.png)
 
 I have setup target tracking policy ,  on Instance CPU utilization i have set 50% 
 
-![image.png](attachment:cbda3acf-7e6f-45ae-a0e2-8c138713243b:image.png)
+![image.png](assests/targettracking.png)
 
 Alarms and SNS Topic Details
 
 Alarms
 
-![image.png](attachment:056e4338-74ba-4442-8e93-27006f27c49d:image.png)
+![image.png](assests/alarm.png)
 
 SNS 
 
-![sns.png](attachment:5416de24-a277-4307-9cc0-6ba1eeec3daa:sns.png)
+![sns.png](assests/sns.png)
 
 
 ## Deployment
