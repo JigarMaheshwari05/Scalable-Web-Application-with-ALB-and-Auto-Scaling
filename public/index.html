@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EC2 Instance Information</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        .card {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(17, 25, 40, 0.75);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">EC2 Instance Monitor</h1>
+            <p class="text-gray-300">Real-time instance information</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                    </svg>
+                    Instance Details
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-gray-400 text-sm">Instance ID</p>
+                        <p id="instanceId" class="font-mono">Loading...</p>
+                    </div>
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-gray-400 text-sm">Private IP</p>
+                        <p id="privateIp" class="font-mono">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                    </svg>
+                    System Information
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-gray-400 text-sm">Instance Type</p>
+                        <p id="instanceType" class="font-mono">Loading...</p>
+                    </div>
+                    <div class="bg-gray-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-gray-400 text-sm">Availability Zone</p>
+                        <p id="availabilityZone" class="font-mono">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <button id="refreshBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center mx-auto">
+                <svg id="refreshIcon" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Refresh Data
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const refreshIcon = document.getElementById('refreshIcon');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        async function fetchInstanceInfo() {
+            refreshIcon.classList.add('refresh-icon');
+            try {
+                const response = await fetch('/api/instance-info');
+                const data = await response.json();
+                
+                document.getElementById('instanceId').textContent = data.instanceId;
+                document.getElementById('privateIp').textContent = data.privateIp;
+                document.getElementById('instanceType').textContent = data.instanceType;
+                document.getElementById('availabilityZone').textContent = data.availabilityZone;
+            } catch (error) {
+                console.error('Error fetching instance info:', error);
+            } finally {
+                refreshIcon.classList.remove('refresh-icon');
+            }
+        }
+
+        refreshBtn.addEventListener('click', fetchInstanceInfo);
+        
+        // Initial fetch
+        fetchInstanceInfo();
+
+        // Auto-refresh every 30 seconds
+        setInterval(fetchInstanceInfo, 30000);
+    </script>
+</body>
+</html>

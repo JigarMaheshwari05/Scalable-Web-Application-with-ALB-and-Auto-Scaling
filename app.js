@@ -1,7 +1,11 @@
 const express = require('express');
 const axios = require('axios');
+const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Serve static files from public directory
+app.use(express.static('public'));
 
 async function getMetadataToken() {
     try {
@@ -38,7 +42,8 @@ async function getMetadata(token, path) {
     }
 }
 
-app.get('/', async (req, res) => {
+// API endpoint for instance data
+app.get('/api/instance-info', async (req, res) => {
     try {
         let instanceId = 'local-development';
         let privateIp = '127.0.0.1';
@@ -48,24 +53,40 @@ app.get('/', async (req, res) => {
         if (token) {
             const fetchedInstanceId = await getMetadata(token, 'instance-id');
             const fetchedPrivateIp = await getMetadata(token, 'local-ipv4');
+            const availabilityZone = await getMetadata(token, 'placement/availability-zone');
+            const instanceType = await getMetadata(token, 'instance-type');
             
             if (fetchedInstanceId && fetchedPrivateIp) {
                 instanceId = fetchedInstanceId;
                 privateIp = fetchedPrivateIp;
             }
-        }
 
-        res.json({
-            instanceId: instanceId,
-            privateIp: privateIp,
-            message: 'Instance Information'
-        });
+            res.json({
+                instanceId,
+                privateIp,
+                availabilityZone: availabilityZone || 'N/A',
+                instanceType: instanceType || 'N/A',
+                message: 'Instance Information'
+            });
+        } else {
+            res.json({
+                instanceId,
+                privateIp,
+                availabilityZone: 'local',
+                instanceType: 'local',
+                message: 'Running in local environment'
+            });
+        }
     } catch (error) {
         res.status(500).json({
             error: 'Error fetching instance metadata',
             details: error.message
         });
     }
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(port, '0.0.0.0', () => {
