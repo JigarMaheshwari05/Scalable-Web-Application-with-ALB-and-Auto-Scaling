@@ -41,20 +41,7 @@ This solution implements a highly available and auto-scaling web application tha
 
 ## Architecture
 
-```
-┌──────────────┐     ┌──────────────┐
-│              │     │  Auto        │
-│   ALB        ├─────┤  Scaling     │
-│  (Port 80)   │     │  Group       │
-└──────────────┘     └──────────────┘
-                            │
-                     ┌──────┴──────┐
-                     │             │
-                ┌────┴───┐    ┌────┴───┐
-                │  EC2   │    │  EC2   │
-                │Instance│    │Instance│
-                └────────┘    └────────┘
-```
+![image.png](assests/Architecture.png)
 
 ### AWS Components
 
