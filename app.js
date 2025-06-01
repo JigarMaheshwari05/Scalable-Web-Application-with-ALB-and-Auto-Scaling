@@ -1,12 +1,20 @@
 const express = require('express');
-const metadata = require('aws-ec2-instance-metadata');
+const metadata = require('ec2-metadata');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.get('/', async (req, res) => {
     try {
-        const instanceId = await metadata.getInstanceId();
-        const privateIp = await metadata.getInstancePrivateIp();
+        let instanceId = 'local-development';
+        let privateIp = '127.0.0.1';
+
+        // Only try to get EC2 metadata if we're running on EC2
+        try {
+            instanceId = await metadata.getInstanceId();
+            privateIp = await metadata.getInstancePrivateIpv4();
+        } catch (metadataError) {
+            console.log('Not running on EC2, using default values');
+        }
         
         res.json({
             instanceId: instanceId,
